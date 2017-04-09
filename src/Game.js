@@ -1,6 +1,37 @@
 import React from 'react';
 import Cell from './Cell';
 import Info from './Info';
+import styled from 'styled-components';
+
+const Grid = styled.div`
+  width: 310px; 
+  display: flex; 
+  align-items: center;
+  justify-content: flex-start; 
+  flexWrap: wrap;
+`
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: column;
+  height: 100vh;
+`
+const Restart = styled.div`
+  box-shadow: inset 0 0 0 0 #59C9A5;
+  color: #000;
+  transition: all .3s ease-in;
+  padding: 8px 16px;
+  cursor: pointer;
+  &:hover {
+    color: #FFF;
+    box-shadow: inset 100px 0 0 0 #59C9A5;
+  }
+`
+const Winner = styled.h1`
+  margin: 32px;
+  color: #D81E5B;
+`
 
 const getInitState = () => ({
   arr: [...new Array(9)].reduce((pre, cur, index) => {
@@ -17,6 +48,13 @@ export default class Game extends React.Component {
     if(this.getResult() && !this.state.winner) {
       this.setState({winner: true})  
     }
+  }
+
+  checkArray = () => {
+    const { arr } = this.state;
+    return Object.keys(arr).reduce(
+      (pre, cur) => pre && arr[cur] !==''
+    , true)
   }
 
   getResult = () => {
@@ -57,20 +95,24 @@ export default class Game extends React.Component {
       <section>
         {
           !winner ? 
-          <div>
+          <Container>
             <Info turn={turn ? 'O' : 'X'} />
-            <div style={{width: '310px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', flexWrap: 'wrap'}}>
+            <Grid>
             {
               Object.keys(arr).map( 
-                (arrId) => <Cell cellId={arrId} status={arr[arrId]} updateArray={this.updateArray}/> 
+                (arrId) => <Cell key={arrId} cellId={arrId} status={arr[arrId]} updateArray={this.updateArray}/> 
               )
             }
-          </div>
-          </div> : 
-          <div>
-            <h1>Winner {!this.state.turn ? 'O' : 'X'} </h1>
-            <div onClick={this.restart} > Restart </div>
-          </div>
+            </Grid>
+            {
+              !this.getResult() && this.checkArray() ? 
+                <Restart onClick={this.restart} > Restart </Restart> : null
+            }
+          </Container> : 
+          <Container>
+            <Winner>Winner {!this.state.turn ? 'O' : 'X'} </Winner>
+            <Restart onClick={this.restart} > Restart </Restart>
+          </Container>
         }
       </section>
     )
